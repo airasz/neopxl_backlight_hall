@@ -11,12 +11,17 @@ long previousMillis =0;
 long previousMillis2 =0;
 
 int interval =100;
-
+int interva2=0;
 int hallsensor=1;
 volatile byte counter;
+bool bfire=false;
 
+
+int r=40;
+int g=0;
+int b=0;
 int angka=0;
-
+void isr()
  {
 
    //Each rotation, this interrupt function is run twice, so take that into consideration for
@@ -26,7 +31,7 @@ int angka=0;
    //Update count
 
       counter++;
-
+      bfire=true;
  }
 void setup (){
     Serial.begin(9600);
@@ -36,32 +41,56 @@ void setup (){
   counter=0;
 }
 void loop (){
+if(bfire){
+  cli();
+  fire();
+}
 
     if(millis()-previousMillis>interval){
-            detachInterrupt(hallsensor);
+        detachInterrupt(hallsensor);
+        angka+=1;
+        if(angka>(1000/interval)){
 
+          detachInterrupt(hallsensor);
+          // cli  ();
+          // rpm=60*1000/(millis()-passedTime)*counter;
+          rpm=counter*60;     // result 200-1200rpm
+          interval
+          passedTime=millis();
+          // Serial.print("RPM = ");
+          // Serial.println(rpm);
 
-    angka+=1;
-    if(angka>(1000/interval)){
+          counter=0;
+          attachInterrupt(hallsensor, isr, FALLING);
 
-      detachInterrupt(hallsensor);
-      // cli  ();
-      // rpm=60*1000/(millis()-passedTime)*counter;
-      rpm=counter*60;
-      passedTime=millis();
-      // Serial.print("RPM = ");
-      // Serial.println(rpm);
+          Serial.print("angka= ");
+          Serial.println(rpm);
+          angka=0;
+        }
 
-      counter=0;
-      attachInterrupt(hallsensor, isr, FALLING);
-      
-
-      Serial.print("angka= ");
-      Serial.println(rpm);
-      angka=0;
+        previousMillis=currentMillis;
     }
 
 
-    previousMillis=currentMillis;
+    if(millis()-previousMillis2>interval2){
+
     }
+
+}
+
+void fire(){
+  for (int q=0; q<PIXEL_COUNT;q++){
+    	 r=random(10, 120);
+    	 g=random(0, 15);
+    	 if(r<80){ g=0;}
+    	// if (r>40) {g=r-60;}
+    	 b=0; 
+    	uint32_t c =lighting.Color (r,g,b);
+	    lighting.setPixelColor(q, c);
+   //strip.setPixelColor(q,c);
+    	
+      lighting.show();
+      bfire=0;
+      sei();
+
 }
