@@ -11,11 +11,13 @@ long previousMillis =0;
 long previousMillis2 =0;
 
 int interval =100;
-int interva2=0;
+int interval2=0;
 int hallsensor=1;
 volatile byte counter;
 bool bfire=false;
+int rpm;
 
+int rev;
 
 int r=40;
 int g=0;
@@ -40,10 +42,11 @@ void setup (){
 
   counter=0;
 }
+int speed;
 void loop (){
 if(bfire){
-  cli();
-  fire();
+  // cli();
+  // fire();
 }
 
     if(millis()-previousMillis>interval){
@@ -55,29 +58,32 @@ if(bfire){
           // cli  ();
           // rpm=60*1000/(millis()-passedTime)*counter;
           rpm=counter*60;     // result 200-1200rpm
-          interval
-          passedTime=millis();
-          // Serial.print("RPM = ");
-          // Serial.println(rpm);
+          speed=counter;  
+          if (counter<1){counter=1; }
+          if(counter>8){counter=8;}
+          // passedTime=millis();
+          Serial.print("counter = ");
+          Serial.println(counter);
 
-          counter=0;
+          counter=1;
           attachInterrupt(hallsensor, isr, FALLING);
 
-          Serial.print("angka= ");
-          Serial.println(rpm);
+          Serial.print("rev= ");
+          Serial.println(rev);
+          
           angka=0;
         }
 
-        previousMillis=currentMillis;
+        previousMillis=millis();
     }
 
 
     if(millis()-previousMillis2>interval2){
-
+        fire();
+        // counter=1;
+        previousMillis2=millis();
     }
-
 }
-
 void fire(){
   for (int q=0; q<PIXEL_COUNT;q++){
     	 r=random(10, 120);
@@ -91,6 +97,9 @@ void fire(){
     	
       lighting.show();
       bfire=0;
-      sei();
+      // interval2=random(5,70);
+       rev=(speed-6)*(-20);
+      interval2=random(5,rev);
+      // sei();
 
-}
+    }}  
